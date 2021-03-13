@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Containers/Queue.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "PedeSegment.generated.h"
@@ -30,6 +32,12 @@ public:
 	class UStaticMeshComponent* MainMeshComponent;
 
 	//TODO ActionComponent
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCameraComponent* TopViewCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class USpringArmComponent* TopSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionNose;
