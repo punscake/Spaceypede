@@ -11,6 +11,7 @@
 
 using namespace std;
 
+
 UCLASS()
 class SPACEYPEDE_API APedeSegment : public APawn
 {
@@ -25,11 +26,12 @@ public:
 	class TQueue<FVector, EQueueMode::Mpsc> FVectorTrailQueue;
 	//TODO location+rotation
 
-	//TODO mesh
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* MainMeshComponent;
 
 	//TODO ActionComponent
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionNose;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -78,12 +80,17 @@ protected:
 		float speedHaltModifier; //multiplier for halting (usually gets set to 0)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float turnRate;
+		float turnMinCircleRadius;
+
+	
 
 private:
 
 	UFUNCTION()
-	void Turn();
+	void SetTurnDirection(float value);
+
+	UPROPERTY()
+	float turnDirection;
 
 	UFUNCTION()
 	void BoostSpeed();
@@ -98,7 +105,16 @@ private:
 	void UnHalt();
 
 	UFUNCTION()
+	void moveAndLeaveTrail(float DeltaTime); //every tick moves and records new location for next-in-line segment
+
+	UFUNCTION()
 	float CalculateSpeed(); //uses baseSpeed, speed modifiers and properties of segments attached to give final movement speed
+
+	UFUNCTION()
+	float CalculateTurnAngle(float distanceTraveledInCircle); //calculates the angle of a circle segment with radius turnMinCircleRadius that is passed for distance traveled
+
+	UFUNCTION()
+	float CalculateDistanceCutThroughCircle(float turnAngle); //calculates distance needed to travel when cutting trough the circle to achieve same distance as distanceTraveledInCircle
 
 protected:
 	// Called when the game starts or when spawned
