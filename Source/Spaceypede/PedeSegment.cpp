@@ -14,9 +14,29 @@ APedeSegment::APedeSegment()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	RotatingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RotatingComponent"));
+	RotatingComponent->SetupAttachment(RootComponent);
 
 	MainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainMeshComponent"));
-	MainMeshComponent->SetupAttachment(RootComponent);
+	MainMeshComponent->SetupAttachment(RotatingComponent);
+
+	CollisionNose = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionNose"));
+	CollisionNose->SetupAttachment(RotatingComponent);
+	CollisionNose->InitSphereRadius(40.0f);
+	CollisionNose->SetCollisionProfileName(TEXT("CollisionNoseHitbox"));
+	CollisionNose->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
+	//CollisionNose->AddLocalOffset(FVector(50.0f, 0.0f, 0.0f));
+
+	CollisionButt = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionButt"));
+	CollisionButt->SetupAttachment(RotatingComponent);
+	CollisionButt->InitSphereRadius(40.0f);
+	CollisionButt->SetCollisionProfileName(TEXT("CollisionButtHitbox"));
+	CollisionButt->SetRelativeLocation(FVector(-50.0f, 0.0f, 0.0f));
+
+	CollisionContactDamage = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionContactDamage"));
+	CollisionContactDamage->SetupAttachment(RotatingComponent);
+	CollisionContactDamage->InitSphereRadius(40.0f);
+	CollisionContactDamage->SetCollisionProfileName(TEXT("CollisionContactDamageHitbox"));
 
 	TopSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TopSpringArm"));
 	TopSpringArm->SetupAttachment(RootComponent);
@@ -30,32 +50,16 @@ APedeSegment::APedeSegment()
 	TopViewCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	
 
-	CollisionNose = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionNose"));
-	CollisionNose->SetupAttachment(RootComponent);
-	CollisionNose->InitSphereRadius(40.0f);
-	CollisionNose->SetCollisionProfileName(TEXT("CollisionNoseHitbox"));
-	CollisionNose->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
-	//CollisionNose->AddLocalOffset(FVector(50.0f, 0.0f, 0.0f));
-
-	CollisionButt = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionButt"));
-	CollisionButt->SetupAttachment(RootComponent);
-	CollisionButt->InitSphereRadius(40.0f);
-	CollisionButt->SetCollisionProfileName(TEXT("CollisionButtHitbox"));
-	CollisionButt->SetRelativeLocation(FVector(-50.0f, 0.0f, 0.0f));
-
-	CollisionContactDamage = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionContactDamage"));
-	CollisionContactDamage->SetupAttachment(RootComponent);
-	CollisionContactDamage->InitSphereRadius(40.0f);
-	CollisionContactDamage->SetCollisionProfileName(TEXT("CollisionContactDamageHitbox"));
+	
 
 	
 
 	isPossessed = false;
 	isRogue = true;
-	baseSpeed = 10.0;
+	baseSpeed = 300.0;
 	speedBoostModifier = 1.0;
-	speedHaltModifier = 1.0;
-	turnMinCircleRadius = 60.0;
+	speedHaltModifier = 0.0;
+	turnMinCircleRadius = 150.0;
 
 	Leads = nullptr;
 	LedBy = nullptr;
@@ -118,7 +122,7 @@ void APedeSegment::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	InputComponent->BindAction("SpeedUp", IE_Pressed, this, &APedeSegment::BoostSpeed);
 	InputComponent->BindAction("SpeedUp", IE_Released, this, &APedeSegment::DeboostSpeed);
 	InputComponent->BindAction("SlowDown", IE_Pressed, this, &APedeSegment::Halt);
-	InputComponent->BindAction("SlowDown", IE_Released, this, &APedeSegment::UnHalt);
+	//InputComponent->BindAction("SlowDown", IE_Released, this, &APedeSegment::UnHalt);
 
 	InputComponent->BindAxis("TurnBinary", this, &APedeSegment::SetTurnDirection);
 
@@ -127,11 +131,12 @@ void APedeSegment::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 
 void APedeSegment::SetTurnDirection(float value) {
-	turnDirection = value;
+	turnDirection = value; //WARNING: setting value to something other that -1.0, 0.0, or 1.0 may result in logic error in moveAndLeaveTrail if statement
 }
 
 void APedeSegment::BoostSpeed() {
 	speedBoostModifier = 2.0;
+	UnHalt();
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Boost pressed")));
 }
 
@@ -150,21 +155,30 @@ void APedeSegment::UnHalt() {
 void APedeSegment::moveAndLeaveTrail(float DeltaTime) {
 
 	float speed = CalculateSpeed();
-	float distanceTraveledInCircle = speed * DeltaTime; //distance along the circumference of a circle with radius turnMinCircleRadius to the wanted point
+	float distanceToTravel = speed * DeltaTime; //distance along the circumference of a circle with radius turnMinCircleRadius to the wanted point, or straight up distance forward
 	float currentTurnDirection = turnDirection; //snapshots the turnDirection for furher calculations
-	float turnAngle = CalculateTurnAngle(distanceTraveledInCircle) * currentTurnDirection; //angle counted from a line tangent to the circle
-	float finalDistance = CalculateDistanceCutThroughCircle(fabs(turnAngle)); //distance needed to reach wanted point on the circle by cutting at angle turnAngle
-	
-	//TODO calculation of turn angle for directional movement
-	
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Turn direction = %f, Turn angle = %f, distance = %f"), currentTurnDirection, turnAngle, distanceTraveledInCircle));
-	
-	//turn
-	FRotator newRotation = GetActorRotation();
-	newRotation.Yaw += turnAngle * 180.0;
-	SetActorRotation(newRotation);
-	//blink
-	
+
+	// checks if turning or going straight, turns RotatingComponent if turning; NOTE: threshholds are arbitrary, possible cases are -1.0, 0.0, 1.0
+	if (currentTurnDirection > 0.5 || currentTurnDirection < -0.5) {
+
+		float turnAngle = CalculateTurnAngle(distanceToTravel) * currentTurnDirection; //angle counted from a line tangent to the circle
+		distanceToTravel = CalculateDistanceCutThroughCircle(fabs(turnAngle)); //distance needed to reach wanted point on the circle by cutting at angle turnAngle
+
+		//TODO calculation of turn angle for directional movement
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Turn direction = %f, Turn angle = %f, distance = %f"), currentTurnDirection, turnAngle, distanceTraveledInCircle));
+		//turn
+		FRotator newRotation = RotatingComponent->GetRelativeRotation();
+		newRotation.Yaw += turnAngle * 180.0;
+		RotatingComponent->SetRelativeRotation(newRotation);
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Distance = %f"), distanceToTravel));
+	//move forward
+	FVector moveVector = RotatingComponent->GetRelativeRotation().Vector() * distanceToTravel;
+	FVector newLocation = GetActorLocation() + moveVector;
+	SetActorLocation(newLocation);
+
 	//report to Leads
 
 
@@ -183,10 +197,9 @@ float APedeSegment::CalculateSpeed() {
 }
 
 float APedeSegment::CalculateTurnAngle(float distanceTraveledInCircle) {
-	float halfCircumference = turnMinCircleRadius * PI;
-	float circleSegmentAngle = distanceTraveledInCircle / halfCircumference; //angle in Pi
+	float circleSegmentAngle = distanceTraveledInCircle / turnMinCircleRadius; //angle in Pi, theta/2pi = distance/r2pi
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("circum = %f, angle = %f"), halfCircumference, circleSegmentAngle));
-	return circleSegmentAngle / 2;
+	return circleSegmentAngle / 2; //angle in Pi
 }
 
 float APedeSegment::CalculateDistanceCutThroughCircle(float turnAngle) {

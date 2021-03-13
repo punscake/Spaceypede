@@ -32,6 +32,8 @@ public:
 	class UStaticMeshComponent* MainMeshComponent;
 
 	//TODO ActionComponent
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* RotatingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* TopViewCamera;
