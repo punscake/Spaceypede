@@ -54,8 +54,8 @@ APedeSegment::APedeSegment()
 
 	
 
-	isPossessed = false;
-	isRogue = true;
+	bIsPossessed = false;
+	bIsRogue = true;
 	baseSpeed = 300.0;
 	speedBoostModifier = 1.0;
 	speedHaltModifier = 0.0;
@@ -80,7 +80,7 @@ void APedeSegment::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (true || isPossessed) {
+	if (true || bIsPossessed) {
 		moveAndLeaveTrail(DeltaTime);
 	}
 	/*

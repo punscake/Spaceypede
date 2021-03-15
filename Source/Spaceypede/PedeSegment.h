@@ -55,15 +55,15 @@ public:
 	class APedeSegment* LedBy;
 
 	/*methods:
-	* connectTo(PedeSegment* otherSegment) - if(otherSegment.getIsRogue) generates an initial trailQueue, otherSegment.setLeads(this), calls passControl
+	* connectTo(PedeSegment* otherSegment) - if(otherSegment.getbIsRogue) generates an initial trailQueue, otherSegment.setLeads(this), calls passControl
 	* setLedBy(PedeSegment* LedBy)
 	* getLedBy()
 	* setLeads(PedeSegment* Leads)
 	* getLeads()
-	* getIsRogue()
-	* passControl(PedeSegment* otherSegment) - unbinds player controlled and camera, this.isPossessed = false, calls otherSegment.recieveControl(PlayerController?)
-	* recieveControl(PlayerController?) - binds player controlled and camera, clears up trailQueue, removes dependancy LedBy, isPossessed = true, isRogue = false
-	* disconnect() - LedBy.setLeads(null), clean up trailQueue, if (!this.isPossessed) set this and the rest of segments rogue=true (or disconnect?)
+	* getbIsRogue()
+	* passControl(PedeSegment* otherSegment) - unbinds player controlled and camera, this.bIsPossessed = false, calls otherSegment.recieveControl(PlayerController?)
+	* recieveControl(PlayerController?) - binds player controlled and camera, clears up trailQueue, removes dependancy LedBy, bIsPossessed = true, bIsRogue = false
+	* disconnect() - LedBy.setLeads(null), clean up trailQueue, if (!this.bIsPossessed) set this and the rest of segments rogue=true (or disconnect?)
 	* 
 	* move() - all move logic each frame
 	* turn()
@@ -75,10 +75,10 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere)
-		bool isPossessed; //possessed by a player
+		bool bIsPossessed; //possessed by a player
 
 	UPROPERTY(VisibleAnywhere)
-		bool isRogue;  //no = belongs to a controlled train
+		bool bIsRogue;  //no = belongs to a controlled train
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) //TODO change to visible only
 		float baseSpeed;
