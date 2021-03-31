@@ -13,7 +13,6 @@
 
 using namespace std;
 
-
 UCLASS()
 class SPACEYPEDE_API APedeSegment : public APawn
 {
@@ -95,6 +94,12 @@ protected:
 	
 
 private:
+
+	UFUNCTION()
+	void BlinkPawnForward(float distance);
+
+	UFUNCTION()
+	void RotatePawnRight(float angleInRadiants);
 
 	UFUNCTION()
 	void SetTurnDirection(float value);

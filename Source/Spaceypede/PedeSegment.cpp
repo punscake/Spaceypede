@@ -59,7 +59,7 @@ APedeSegment::APedeSegment()
 	baseSpeed = 300.0;
 	speedBoostModifier = 1.0;
 	speedHaltModifier = 0.0;
-	turnMinCircleRadius = 150.0;
+	turnMinCircleRadius = 500.0;
 
 	Leads = nullptr;
 	LedBy = nullptr;
@@ -157,7 +157,7 @@ void APedeSegment::moveAndLeaveTrail(float DeltaTime) {
 	float speed = CalculateSpeed();
 	float distanceToTravel = speed * DeltaTime; //distance along the circumference of a circle with radius turnMinCircleRadius to the wanted point, or straight up distance forward
 	float currentTurnDirection = turnDirection; //snapshots the turnDirection for furher calculations
-
+	
 	// checks if turning or going straight, turns RotatingComponent if turning; NOTE: threshholds are arbitrary, possible cases are -1.0, 0.0, 1.0
 	if (currentTurnDirection > 0.5 || currentTurnDirection < -0.5) {
 
@@ -166,18 +166,14 @@ void APedeSegment::moveAndLeaveTrail(float DeltaTime) {
 
 		//TODO calculation of turn angle for directional movement
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Turn direction = %f, Turn angle = %f, distance = %f"), currentTurnDirection, turnAngle, distanceTraveledInCircle));
-		//turn
-		FRotator newRotation = RotatingComponent->GetRelativeRotation();
-		newRotation.Yaw += turnAngle * 180.0;
-		RotatingComponent->SetRelativeRotation(newRotation);
+		RotatePawnRight(turnAngle);
+		BlinkPawnForward(distanceToTravel);
+		RotatePawnRight(turnAngle); //rotation is done twice to align the view with a tangent to the circle at that point
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Distance = %f"), distanceToTravel));
-	//move forward
-	FVector moveVector = RotatingComponent->GetRelativeRotation().Vector() * distanceToTravel;
-	FVector newLocation = GetActorLocation() + moveVector;
-	SetActorLocation(newLocation);
+	else {
+		BlinkPawnForward(distanceToTravel);
+	}
+	
 
 	//report to Leads
 
@@ -189,6 +185,24 @@ void APedeSegment::moveAndLeaveTrail(float DeltaTime) {
 		* leave trail for connected segment
 		* report distance traveled to connected segment
 		*/
+}
+
+
+void APedeSegment::BlinkPawnForward(float distance) {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Distance = %f"), distanceToTravel));
+	//move forward
+	FVector moveVector = RotatingComponent->GetRelativeRotation().Vector() * distance;
+	FVector newLocation = GetActorLocation() + moveVector;
+	SetActorLocation(newLocation);
+}
+
+
+void APedeSegment::RotatePawnRight(float angleInRadiants) {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Turn direction = %f, Turn angle = %f, distance = %f"), currentTurnDirection, turnAngle, distanceTraveledInCircle));
+		//turn
+	FRotator newRotation = RotatingComponent->GetRelativeRotation();
+	newRotation.Yaw += angleInRadiants * 180.0;
+	RotatingComponent->SetRelativeRotation(newRotation);
 }
 
 float APedeSegment::CalculateSpeed() {
