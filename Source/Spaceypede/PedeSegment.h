@@ -24,34 +24,37 @@ public:
 	// Sets default values for this pawn's properties
 	APedeSegment();
 
-	class TQueue<FVector, EQueueMode::Mpsc> FVectorTrailQueue;
+	
+		TQueue<FVector, EQueueMode::Mpsc> FVectorTrailQueue;
 	//TODO location+rotation
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* MainMeshComponent;
+		class UStaticMeshComponent* MainMeshComponent;
 
 	//TODO ActionComponent
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USceneComponent* RotatingComponent;
+		class USceneComponent* RotatingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UCameraComponent* TopViewCamera;
+		class UCameraComponent* TopViewCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class USpringArmComponent* TopSpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USphereComponent* CollisionNose;
+		class USphereComponent* CollisionNose;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USphereComponent* CollisionButt;
+		class USphereComponent* CollisionButt;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USphereComponent* CollisionContactDamage;
+		class USphereComponent* CollisionContactDamage;
 
-	class APedeSegment* Leads;
+	UPROPERTY()
+		class APedeSegment* Leads;
 
-	class APedeSegment* LedBy;
+	UPROPERTY()
+		class APedeSegment* LedBy;
 
 	/*methods:
 	* connectTo(PedeSegment* otherSegment) - if(otherSegment.getbIsRogue) generates an initial trailQueue, otherSegment.setLeads(this), calls passControl

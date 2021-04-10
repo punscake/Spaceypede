@@ -70,7 +70,7 @@ void APedeSegment::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	
 	
 
 }

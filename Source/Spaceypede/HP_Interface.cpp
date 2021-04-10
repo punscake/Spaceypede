@@ -29,28 +29,24 @@ void UHP_Interface::BeginPlay()
 
 void UHP_Interface::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	
-
-	if (IsInvincible()) {
-		return;
-	}
-	if (Damage < 0) {	//if HEALING
+	float TrueDecrement = CalculateTrueDamage(Damage);
+	if (TrueDecrement < 0) {	//if HEALING
 		float toMaxHP = maxHP - currentHP;
-		Damage *= -1;
-		if (Damage > toMaxHP) {
+		TrueDecrement *= -1;
+		if (TrueDecrement > toMaxHP) {
 			currentHP = maxHP;
 			OnIncrementHealthDelegate.Broadcast(toMaxHP);
 		}
 		else {
-			currentHP += Damage;
-			OnIncrementHealthDelegate.Broadcast(Damage);
+			currentHP += TrueDecrement;
+			OnIncrementHealthDelegate.Broadcast(TrueDecrement);
 		}
 	}
-	else {
-		if (currentHP > Damage) {
-			OnIncrementHealthDelegate.Broadcast(Damage * -1);
-			currentHP -= Damage;
-			ProcInvincibility(Damage);
+	else if (!IsInvincible()) {
+		if (currentHP > TrueDecrement) {
+			OnIncrementHealthDelegate.Broadcast(TrueDecrement * -1);
+			currentHP -= TrueDecrement;
+			ProcInvincibility(TrueDecrement);
 		}
 		else {
 			OnIncrementHealthDelegate.Broadcast(currentHP * -1);
@@ -60,11 +56,16 @@ void UHP_Interface::TakeDamage(AActor* DamagedActor, float Damage, const UDamage
 	}
 }
 
+float UHP_Interface::CalculateTrueDamage(float damage)
+{
+	return damage;
+}
+
 bool UHP_Interface::IsInvincible()
 {
 	float timeSinceLast = GetWorld()->GetTimeSeconds() - invincibilityGainTimeSeconds;
 	if (timeSinceLast > currentInvulnerabilityTimer) {
-		currentInvulnerabilityTimer = 0.0;
+		currentInvulnerabilityTimer = 0.f;
 		return true;
 	}
 	return false;
@@ -75,6 +76,15 @@ void UHP_Interface::ProcInvincibility(float damage)
 	float percentageOfMaxDPS = damage / maxIncomingDPS;
 	currentInvulnerabilityTimer = percentageOfMaxDPS;
 	invincibilityGainTimeSeconds = GetWorld()->GetTimeSeconds();
+}
+
+float UHP_Interface::DamageInstancesToDeath(float damageInstance)
+{
+	if (damageInstance <= 0.f) {
+		return 999999.f; //TODO make this not trash
+	}
+	float TrueDamage = CalculateTrueDamage(damageInstance);
+	return currentHP / TrueDamage;
 }
 
 // Called every frame

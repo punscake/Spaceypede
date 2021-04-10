@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
 #include "HP_Interface.generated.h"
 
 
@@ -43,6 +44,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 		bool bUseInvulnerability;
 
+	UPROPERTY(EditAnywhere)
+		bool bCanBeHealed;
+
 	UPROPERTY()
 		float invincibilityGainTimeSeconds;
 
@@ -50,43 +54,21 @@ protected:
 		void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UFUNCTION()
+		float CalculateTrueDamage(float damage);
+
+	UFUNCTION()
 		bool IsInvincible();
 
 	UFUNCTION()
 		void ProcInvincibility(float damage);
 
-public:	
+
+public:
+	UFUNCTION()
+	float DamageInstancesToDeath(float damageInstance); //how many damage instances are needed to set hp to 0
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 		
 };
-/*UDELEGATE()
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FIncrementHealthDelegate, int, healthIncrement);
-//DECLARE_EVENT_OneParam(this, FIncrementHealthDelegate, int, healthIncrement);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTestDelegate);
-
-
-class SPACEYPEDE_API HP_Interface
-{
-public:
-	HP_Interface();
-	~HP_Interface();
-
-protected:
-	void IncrementHealth(int incrementAmount);
-
-	/*UPROPERTY()
-		//DECLARE_EVENT_OneParam(this, FIncrementHealthDelegate, int, healthIncrement)
-		FIncrementHealthDelegate OnIncrementHealth;
-	/*
-
-	UPROPERTY(BlueprintAssignable, Category = "Test")
-		FTestDelegate OnTestDelegate();
-	
-	//DECLARE_DELEGATE(DelegateName)
-	//DelegateName Function();
-
-	int healthPoints;
-
-};*/
