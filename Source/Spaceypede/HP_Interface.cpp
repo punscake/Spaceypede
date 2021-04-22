@@ -80,7 +80,7 @@ void UHP_Interface::ProcInvincibility(float damage)
 
 float UHP_Interface::DamageInstancesToDeath(float damageInstance)
 {
-	if (damageInstance <= 0.f) {
+	if (damageInstance <= 0.01f) {
 		return 999999.f; //TODO make this not trash
 	}
 	float TrueDamage = CalculateTrueDamage(damageInstance);

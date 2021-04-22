@@ -23,7 +23,6 @@ class SPACEYPEDE_API APedeSegment : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APedeSegment();
-
 	
 		TQueue<FVector, EQueueMode::Mpsc> FVectorTrailQueue;
 	//TODO location+rotation
