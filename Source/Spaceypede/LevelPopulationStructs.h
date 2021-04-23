@@ -23,10 +23,6 @@ struct FStructureAndLocation {
 	//or
 	float atDifficulty; //negative number means ignored
 
-	/*
-	inline bool operator==(const FStructureAndLocation& lhs, const FStructureAndLocation& rhs) {
-		return false;
-	}*/
 	bool operator==(const FStructureAndLocation& a) const
 	{
 		return false;

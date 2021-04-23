@@ -3,7 +3,7 @@
 
 #include "LevelPopulator.h"
 
-bool LevelPopulator::InitProperties(float newDifficultyScaleMultiplier, unsigned int newSeed, unsigned int newLevelNumber)
+bool ULevelPopulator::InitProperties(float newDifficultyScaleMultiplier, unsigned int newSeed, unsigned int newLevelNumber)
 {
 	if (bAlreadyInitialized) {
 		return false;
@@ -16,7 +16,7 @@ bool LevelPopulator::InitProperties(float newDifficultyScaleMultiplier, unsigned
 	return true;
 }
 
-void LevelPopulator::SpawnStructures(FStructureAndLocationArray StructureAndLocationArray)
+void ULevelPopulator::SpawnStructures(FStructureAndLocationArray StructureAndLocationArray)
 {
 }
 

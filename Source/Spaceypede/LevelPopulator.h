@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "LevelPopulationStructs.h"
 
-//#include "LevelPopulator.generated.h"
+#include "LevelPopulator.generated.h"
 
-
-class LevelPopulator
+UCLASS()
+class ULevelPopulator : public UClass
 {
-	
+	GENERATED_BODY()
 private:
 
 	const float DIFFICULTYSCALINGPERMETER = 0.001;
@@ -41,10 +41,10 @@ public:
 		float GetDifficultyAtLocation(FVector location);
 		*/
 		virtual void SpawnStructures(FStructureAndLocationArray StructureAndLocationArray); //structure generation DEPENDS on this, overriding may break the normal game flow
+/*
+		virtual void SpawnRandomEnemies (enemy array, densityPerSquareM, radius);  //needs to populate the level with enemies with corresponding restrictions and difficulty, shouldn't overlap with other structures
 
-		virtual void SpawnRandomEnemies (/*enemy array, densityPerSquareM, radius*/) = 0;  //needs to populate the level with enemies with corresponding restrictions and difficulty, shouldn't overlap with other structures
+		virtual void SpawnRandomDebris (debris array, densityPerSquareM, radius); //needs to populate the level with miselaneous actors with corresponding restrictions and difficulty, shouldn't overlap with other structures and enemies
 
-		virtual void SpawnRandomDebris (/*debris array, densityPerSquareM, radius*/) = 0; //needs to populate the level with miselaneous actors with corresponding restrictions and difficulty, shouldn't overlap with other structures and enemies
-
-	
+	*/
 };

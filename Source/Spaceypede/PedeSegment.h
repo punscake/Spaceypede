@@ -24,6 +24,9 @@ public:
 	// Sets default values for this pawn's properties
 	APedeSegment();
 	
+	UFUNCTION()
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 		TQueue<FVector, EQueueMode::Mpsc> FVectorTrailQueue;
 	//TODO location+rotation
 
@@ -93,7 +96,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float turnMinCircleRadius;
 
-	
+	UPROPERTY(EditAnywhere)
+		float forTesting = 0.f;
 
 private:
 

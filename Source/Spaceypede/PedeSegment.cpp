@@ -13,6 +13,7 @@ APedeSegment::APedeSegment()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
+	
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	RotatingComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RotatingComponent"));
 	RotatingComponent->SetupAttachment(RootComponent);
@@ -24,7 +25,7 @@ APedeSegment::APedeSegment()
 	CollisionNose->SetupAttachment(RotatingComponent);
 	CollisionNose->InitSphereRadius(40.0f);
 	CollisionNose->SetCollisionProfileName(TEXT("CollisionNoseHitbox"));
-	CollisionNose->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
+	CollisionNose->SetRelativeLocation(FVector(forTesting, 0.0f, 0.0f));
 	//CollisionNose->AddLocalOffset(FVector(50.0f, 0.0f, 0.0f));
 
 	CollisionButt = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionButt"));
@@ -48,7 +49,6 @@ APedeSegment::APedeSegment()
 	TopViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("TopViewCamera"));
 	TopViewCamera->SetupAttachment(TopSpringArm);
 	TopViewCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	
 
 	
 
@@ -187,6 +187,11 @@ void APedeSegment::moveAndLeaveTrail(float DeltaTime) {
 		*/
 }
 
+
+void APedeSegment::OnConstruction(const FTransform& Transform)
+{
+	CollisionNose->SetRelativeLocation(FVector(forTesting, 0.0f, 0.0f));
+}
 
 void APedeSegment::BlinkPawnForward(float distance) {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Distance = %f"), distanceToTravel));
