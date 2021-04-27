@@ -6,23 +6,11 @@
 #include "Components/SceneComponent.h"
 #include "Containers/Array.h"
 #include "Components/SphereComponent.h"
+#include "BasicTwoDShapesCollisionHelper.h"
 
 #include "TwoDimentionalPseudoCollisionComp.generated.h"
 
-UENUM()
-enum EnumTypeOfHitbox
-{
-	Square      UMETA(DisplayName = "Square"),
-	Ellipse     UMETA(DisplayName = "Ellipse"),
-};
 
-USTRUCT()
-struct FLineSegmentPoints {
-	GENERATED_BODY()
-
-	FVector firstPoint;
-	FVector secondPoint;
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEYPEDE_API UTwoDimentionalPseudoCollisionComp : public USceneComponent
@@ -36,11 +24,11 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+	
 private:
 
 	UPROPERTY(EditAnywhere)
-		TEnumAsByte<EnumTypeOfHitbox> TypeOfHitbox;
+		TEnumAsByte<FEnumTypeOfHitbox> TypeOfHitbox;
 
 	UPROPERTY()
 		TArray<USphereComponent*> EditorVisualMarkers;
@@ -71,7 +59,7 @@ public:
 		void EditorOnlyMoveMarkers();
 
 	UFUNCTION()
-		static bool IsOverlappingTwoDimentional();
+		bool IsOverlappingTwoDimentional();
 
 	//UFUNCTION()
 

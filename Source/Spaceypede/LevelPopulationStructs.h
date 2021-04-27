@@ -13,7 +13,7 @@ USTRUCT()
 struct FStructureAndLocation {
 	GENERATED_BODY()
 
-		bool bHasValues;
+	bool bHasValues;
 	FVector directionFromCenter;
 	FVector pointingTowards;
 	class TSubclassOf<UStructurePlacer> * structure;
